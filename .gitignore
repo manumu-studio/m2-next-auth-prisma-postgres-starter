@@ -63,3 +63,6 @@ ops/
 logs2.txt
 brew/
 
+
+# Local docs and deprecated code
+docs/_archive/

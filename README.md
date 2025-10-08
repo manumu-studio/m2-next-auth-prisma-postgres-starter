@@ -1,7 +1,5 @@
 # M2 Auth & Profiles — Next.js + Prisma + Postgres (+ Chakra)
 
-[![CI](https://github.com/your-username/m2-next-auth-prisma-postgres-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/your-username/m2-next-auth-prisma-postgres-starter/actions/workflows/ci.yml)
-[![Deploy](https://github.com/your-username/m2-next-auth-prisma-postgres-starter/actions/workflows/vercel.yml/badge.svg)](https://github.com/your-username/m2-next-auth-prisma-postgres-starter/actions/workflows/vercel.yml)
 
 A focused Next.js starter with **Credentials sign-in/sign-up**, **Prisma + Postgres**, and **Chakra UI**. Built with the **App Router**, **TypeScript**, **Zod** validation, and a clean **server/client boundary**.
 
@@ -68,27 +66,46 @@ pnpm dev
 Open http://localhost:3000
 
 📁 Project Structure (key parts)
+
 src/
   app/
-    layout.tsx         # Server component root
-    providers.tsx      # Client-only Chakra provider
-    page.tsx           # Demo: opens Auth modal w/ initialTab
-  components/
+    (public)/
+      page.tsx              # demo entry
+    api/
+      auth/[...nextauth]/   # NextAuth route (GET/POST handlers)
+      debug-session/        # session debug endpoint
+    layout.tsx              # Server root; SSR session → Providers
+    providers.tsx           # Client: SessionProvider + Chakra
+  features/
     auth/
-      AuthModal/       # Unified modal (Sign in / Sign up)
-      AuthLayout/      # Switches form by initialTab
-      SignInForm/
-      shared/
-    registration/
-      SignupForm/
+      components/
+        AuthModal/
+        AuthLayout/
+        SignInForm/
+        SignupForm/
+        UserCard/
+        SessionBadge/
+      server/
+        options.ts          # NextAuth config
+        actions/
+          signin.ts
+          signup.ts
+        queries.ts
+      lib/
+        auth-client.ts      # (reserved)
+        auth-ssr.ts         # (reserved)
+      types/
+        next-auth.d.ts      # session/user augmentation (role, id)
   lib/
-    auth/
-      signin.ts        # Server action: sign-in
-      signup.ts        # Server action: sign-up
-      types.ts         # Shared ActionResult type
-    schemas/           # Zod: fields.ts, signin.ts, signup.ts
-    env.ts             # Server-only env loader (Zod)
-    prisma.ts          # Prisma client
+    env.ts                  # server-only env loader (Zod)
+    prisma.ts               # Prisma client
+    validation/
+      fields.ts
+      signin.ts
+      signup.ts
+  docs/
+    _archive/               # deprecated & future features (documented)
+
 
 🔒 Unified Action Result
 export type ActionResult =
@@ -119,6 +136,16 @@ Entry 0 — Bootstrap
 Entry 1 — Signup (UI + Server Action)
 
 Entry 2 — Sign-in + Unified Actions + Env/Migration
+
+### Sessions via NextAuth (Credentials)
+
+This project uses Auth.js (NextAuth) Credentials with the Prisma adapter to create real sessions.
+
+- Config lives in `src/auth.ts` (Credentials provider, Prisma adapter, `session: 'database'`).
+- API route: `src/app/api/auth/[...nextauth]/route.ts` re-exports NextAuth handlers.
+- Sign-in: the `SignInForm` calls `signIn('credentials', { redirect:false })`.
+- Providers remain split: `app/layout.tsx` is server, `app/providers.tsx` is client and wraps `SessionProvider` + `ChakraProvider`.
+- Env: requires `NEXTAUTH_SECRET` and `NEXTAUTH_URL` (or `AUTH_URL` fallback) parsed via `src/lib/env.ts`.
 
 🗂 Roadmap (next)
 
