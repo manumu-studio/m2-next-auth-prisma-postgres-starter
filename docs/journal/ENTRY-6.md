@@ -190,6 +190,7 @@ This cleanup phase provides:
 
 ---
 
+<<<<<<< HEAD
 ## Theme Parity Hotfix
 
 Following the initial cleanup, a hotfix branch (`hotfix/theme-parity-ui`) addressed UI/theme synchronization issues:
